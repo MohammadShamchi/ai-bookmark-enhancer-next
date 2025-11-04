@@ -31,7 +31,7 @@ AI Bookmark Enhancer v2 is a complete rebuild of the bookmark management extensi
 1. Open Chrome and navigate to `chrome://extensions`
 2. Enable **Developer mode** (toggle in top-right corner)
 3. Click **Load unpacked**
-4. Select the `ai-bookmark-enhancer/` directory from this repository
+4. Select the root directory of this repository
 5. Click the extension icon in your toolbar to launch the full-screen interface
 
 ## Development
@@ -40,13 +40,25 @@ This extension uses vanilla JavaScript and Chrome Extension APIs. No build step 
 
 **Project structure:**
 ```
-ai-bookmark-enhancer/
+ai-bookmark-enhancer-next/
 ├── manifest.json          # Extension manifest (MV3)
 ├── background.js          # Service worker
 ├── lib/                   # Shared utilities
-└── ui/                    # Full-screen interface
-    ├── index.html
-    └── styles.css
+│   ├── ai_client.js       # AI categorization logic
+│   ├── backup.js          # Export/import functionality
+│   ├── bookmarks.js       # Bookmark reading utilities
+│   ├── messages.js        # Message constants
+│   ├── organizer.js       # Organization logic
+│   ├── storage.js         # Storage utilities
+│   └── ui.js              # UI helpers
+├── ui/                    # Full-screen interface
+│   ├── onboarding.html/js # Onboarding flow
+│   ├── page1.html/js      # Main organization page
+│   ├── page2.html/js      # Review page
+│   ├── page3.html/js      # Results page
+│   └── settings.html/js   # Settings page
+└── docs/                  # Documentation
+    └── architecture.md
 ```
 
 ## Versions
