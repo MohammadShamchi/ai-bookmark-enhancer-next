@@ -31,6 +31,16 @@
             justify-content: center;
             min-height: 100vh;
             padding: 40px 20px;
+            opacity: 0;
+            transition: opacity .25s ease;
+        }
+
+        body.page-ready {
+            opacity: 1;
+        }
+
+        body.page-exit {
+            opacity: 0;
         }
 
         .panel {
@@ -55,6 +65,55 @@
             font-weight: 600;
             letter-spacing: -0.02em;
             margin-bottom: 6px;
+        }
+
+        .panel-nav {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .settings-chip {
+            position: relative;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all .15s ease;
+        }
+
+        .settings-chip:hover {
+            color: var(--accent);
+            border-color: rgba(95, 224, 193, 0.35);
+            background: rgba(95, 224, 193, 0.08);
+        }
+
+        .settings-chip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -32px;
+            right: 0;
+            background: rgba(22, 24, 28, 0.95);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(4px);
+            pointer-events: none;
+            transition: opacity .15s ease, transform .15s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .settings-chip:hover::after {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .subtitle {
@@ -228,13 +287,18 @@
 
 <body>
     <div class="panel">
+        <div class="panel-nav">
+            <button id="settings-nav" class="settings-chip" data-tooltip="Manage API key" aria-label="Manage API key">
+                ⚙ Settings
+            </button>
+        </div>
         <div class="header">
             <div class="title">AI Bookmark Enhancer</div>
             <div class="subtitle">Smart organization, zero clutter.</div>
         </div>
 
         <div class="summary">
-            <div class="metric">128</div>
+            <div class="metric">0</div>
             <div class="metric-label">bookmarks detected</div>
         </div>
 

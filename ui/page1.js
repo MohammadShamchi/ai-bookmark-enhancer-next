@@ -1,15 +1,18 @@
 import { MSG } from '../lib/messages.js';
 import { readBookmarks } from '../lib/bookmarks.js';
 import { sendRuntimeMessage } from '../lib/runtime_bus.js';
+import { markPageReady, navigateWithTransition } from '../lib/ui.js';
 
 const organizeBtn = document.getElementById('organize-btn');
 const connectBtn = document.getElementById('connect-key');
 const keyHint = document.getElementById('key-hint');
 const metricEl = document.querySelector('.metric');
+const settingsNav = document.getElementById('settings-nav');
 
 init();
 
 async function init() {
+  markPageReady();
   await hydrateBookmarkCount();
   await hydrateKeyState();
   await resumeIfRunning();
@@ -39,7 +42,7 @@ async function resumeIfRunning() {
   try {
     const response = await sendRuntimeMessage({ type: MSG.PROGRESS_SYNC });
     if (response?.runMeta?.status === 'running' || response?.isRunning) {
-      location.replace('page2.html');
+      navigateWithTransition('page2.html', { replace: true });
     }
   } catch (error) {
     console.warn('[page1] Unable to sync progress', error);
@@ -54,7 +57,7 @@ function bindEvents() {
       try {
         const result = await sendRuntimeMessage({ type: MSG.START_ORGANIZE });
         if (result?.ok || result?.reason === 'ALREADY_RUNNING') {
-          location.href = 'page2.html';
+          navigateWithTransition('page2.html');
           return;
         }
         if (result?.reason === 'MISSING_KEY') {
@@ -77,9 +80,13 @@ function bindEvents() {
       if (chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
       } else {
-        location.href = 'settings.html';
+        navigateWithTransition('settings.html');
       }
     });
+  }
+
+  if (settingsNav) {
+    settingsNav.addEventListener('click', () => navigateWithTransition('settings.html'));
   }
 
   document.querySelectorAll('.accordion-header').forEach((header) => {

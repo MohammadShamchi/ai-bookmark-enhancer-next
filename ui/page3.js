@@ -1,6 +1,7 @@
 import { MSG } from '../lib/messages.js';
 import { getOrganized, getRunMeta } from '../lib/storage.js';
 import { sendRuntimeMessage } from '../lib/runtime_bus.js';
+import { markPageReady, navigateWithTransition } from '../lib/ui.js';
 
 const statusPill = document.getElementById('status-pill');
 const subtitleEl = document.getElementById('results-subtitle');
@@ -10,10 +11,16 @@ const emptyState = document.getElementById('empty-state');
 const openBookmarksBtn = document.getElementById('open-bookmarks');
 const downloadBackupBtn = document.getElementById('download-backup');
 const rerunBtn = document.getElementById('rerun-analysis');
+const modal = document.getElementById('confirm-modal');
+const modalConfirmBtn = document.getElementById('confirm-rerun');
+const modalCancelBtn = document.getElementById('cancel-rerun');
+const modalCloseBtn = document.getElementById('close-modal');
+const settingsNav = document.getElementById('settings-nav');
 
 init();
 
 async function init() {
+  markPageReady();
   const runMeta = await getRunMeta();
 
   if (!runMeta || runMeta.status === 'idle') {
@@ -23,7 +30,7 @@ async function init() {
   }
 
   if (runMeta.status === 'running') {
-    location.replace('page2.html');
+    navigateWithTransition('page2.html', { replace: true });
     return;
   }
 
@@ -79,6 +86,14 @@ function renderSummary(runMeta, organized) {
 function renderFolders(runMeta, organized) {
   if (!foldersContainer) return;
   if (runMeta?.status !== 'success' || !organized?.folders) {
+    if (foldersContainer) {
+      foldersContainer.innerHTML = '';
+      foldersContainer.hidden = true;
+    }
+    if (emptyState) {
+      emptyState.hidden = false;
+      emptyState.textContent = 'No organized folders yet. Re-run analysis when ready.';
+    }
     return;
   }
 
@@ -121,9 +136,14 @@ function renderIdleState() {
 }
 
 function attachActions(runMeta) {
+  if (settingsNav) {
+    settingsNav.addEventListener('click', () => navigateWithTransition('settings.html'));
+  }
+
   if (openBookmarksBtn) {
     openBookmarksBtn.addEventListener('click', () => {
       chrome.tabs.create({ url: 'chrome://bookmarks' });
+      showToast('Bookmark Manager opened in a new tab.');
     });
   }
 
@@ -150,28 +170,28 @@ function attachActions(runMeta) {
   }
 
   if (rerunBtn) {
-    rerunBtn.addEventListener('click', async () => {
-      if (!confirm('Re-run analysis? This will start a new organization pass.')) {
-        return;
-      }
-      const original = rerunBtn.textContent;
-      rerunBtn.disabled = true;
-      rerunBtn.textContent = 'Starting...';
-      try {
-        const result = await sendRuntimeMessage({ type: MSG.START_ORGANIZE });
-        if (result?.ok || result?.reason === 'ALREADY_RUNNING') {
-          location.href = 'page2.html';
-        } else if (result?.reason === 'MISSING_KEY') {
-          showToast('Connect your OpenAI key in settings before running.');
-        } else {
-          showToast('Unable to start. Check your key and try again.');
-        }
-      } catch (error) {
-        console.error('[page3] Failed to start new run', error);
-        showToast('Unable to start. Check console for details.');
-      } finally {
-        rerunBtn.disabled = false;
-        rerunBtn.textContent = original;
+    rerunBtn.addEventListener('click', () => {
+      openModal();
+    });
+  }
+
+  if (modalConfirmBtn) {
+    modalConfirmBtn.addEventListener('click', async () => {
+      await triggerRerun();
+    });
+  }
+
+  if (modalCancelBtn) {
+    modalCancelBtn.addEventListener('click', closeModal);
+  }
+
+  if (modalCloseBtn) {
+    modalCloseBtn.addEventListener('click', closeModal);
+  }
+  if (modal) {
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        closeModal();
       }
     });
   }
@@ -222,4 +242,41 @@ function showToast(message) {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 250);
   }, 2000);
+}
+
+function openModal() {
+  if (!modal) return;
+  modal.removeAttribute('hidden');
+  requestAnimationFrame(() => modal.classList.add('visible'));
+}
+
+function closeModal() {
+  if (!modal) return;
+  modal.classList.remove('visible');
+  setTimeout(() => modal.setAttribute('hidden', 'true'), 160);
+}
+
+async function triggerRerun() {
+  if (!modalConfirmBtn || !rerunBtn) return;
+  modalConfirmBtn.disabled = true;
+  rerunBtn.disabled = true;
+  modalConfirmBtn.textContent = 'Starting...';
+  try {
+    const result = await sendRuntimeMessage({ type: MSG.START_ORGANIZE });
+    if (result?.ok || result?.reason === 'ALREADY_RUNNING') {
+      closeModal();
+      navigateWithTransition('page2.html');
+    } else if (result?.reason === 'MISSING_KEY') {
+      showToast('Connect your OpenAI key in settings before running.');
+    } else {
+      showToast('Unable to start. Check your key and try again.');
+    }
+  } catch (error) {
+    console.error('[page3] Failed to start new run', error);
+    showToast('Unable to start. Check console for details.');
+  } finally {
+    modalConfirmBtn.disabled = false;
+    rerunBtn.disabled = false;
+    modalConfirmBtn.textContent = 'Yes, start over';
+  }
 }

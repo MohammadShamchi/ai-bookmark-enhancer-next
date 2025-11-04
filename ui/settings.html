@@ -27,7 +27,11 @@
     align-items: center;
     min-height: 100vh;
     padding: 32px 20px;
+    opacity: 0;
+    transition: opacity .25s ease;
   }
+  body.page-ready { opacity: 1; }
+  body.page-exit { opacity: 0; }
 
   .panel {
     width: 100%;
@@ -169,6 +173,83 @@
     color: #ff6b6b;
   }
 
+  .developer-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .developer-card h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .toggle-row label {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255,255,255,0.15);
+    transition: .2s;
+    border-radius: 999px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #0E1013;
+    transition: .2s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: rgba(95,224,193,0.7);
+  }
+  input:checked + .slider:before {
+    transform: translateX(18px);
+  }
+  .dev-status {
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: none;
+  }
+  .dev-status.visible {
+    display: block;
+  }
+
   .footer-tip {
     text-align: center;
     font-size: 12.5px;
@@ -220,6 +301,20 @@
     </div>
 
     <div class="status" id="status"></div>
+
+    <div class="developer-card">
+      <h3>Developer tools</h3>
+      <div class="toggle-row">
+        <label for="fast-mode-toggle">Fast mode</label>
+        <label class="switch">
+          <input type="checkbox" id="fast-mode-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="fast-mode-label" style="font-size:13px;color:var(--text-secondary);"></div>
+      <button class="btn-secondary" id="status-btn">Request current status</button>
+      <div class="dev-status" id="dev-status"></div>
+    </div>
 
     <div class="footer-tip">Your API key is stored locally and never shared.</div>
   </div>

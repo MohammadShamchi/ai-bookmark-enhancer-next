@@ -1,6 +1,7 @@
 import { MSG } from '../lib/messages.js';
 import { PROGRESS_STEPS } from '../lib/progress_steps.js';
 import { sendRuntimeMessage } from '../lib/runtime_bus.js';
+import { markPageReady, navigateWithTransition } from '../lib/ui.js';
 
 const barEl = document.getElementById('bar');
 const percentEl = document.getElementById('percent');
@@ -13,6 +14,9 @@ const cancelBtn = document.getElementById('cancel-btn');
 const errorPanel = document.getElementById('error-panel');
 const errorMsg = document.getElementById('error-msg');
 const cancelledPanel = document.getElementById('cancelled-panel');
+const settingsNav = document.getElementById('settings-nav');
+const errorSettingsBtn = document.getElementById('error-settings');
+const cancelledHomeBtn = document.getElementById('cancelled-home');
 
 const state = {
   stageId: 'read',
@@ -22,10 +26,12 @@ const state = {
 init();
 
 async function init() {
+  markPageReady();
   bindCancel();
   chrome.runtime.onMessage.addListener(handleRuntimeMessage);
   renderTasks(state.stageId);
   await hydrateFromSync();
+  bindNav();
 }
 
 function bindCancel() {
@@ -48,13 +54,13 @@ async function hydrateFromSync() {
   try {
     const response = await sendRuntimeMessage({ type: MSG.PROGRESS_SYNC });
     if (!response?.runMeta) {
-      location.replace('page1.html');
+      navigateWithTransition('page1.html', { replace: true });
       return;
     }
 
     state.runMeta = response.runMeta;
     if (state.runMeta.status === 'success') {
-      location.replace('page3.html');
+      navigateWithTransition('page3.html', { replace: true });
       return;
     }
 
@@ -74,7 +80,7 @@ async function hydrateFromSync() {
     showProcessing();
   } catch (error) {
     console.error('[page2] Failed to sync progress', error);
-    location.replace('page1.html');
+    navigateWithTransition('page1.html', { replace: true });
   }
 }
 
@@ -90,7 +96,7 @@ function handleRuntimeMessage(message) {
   }
 
   if (message.type === MSG.ORGANIZE_DONE) {
-    location.href = 'page3.html';
+    navigateWithTransition('page3.html');
     return;
   }
 
@@ -191,5 +197,17 @@ function getErrorMessage(code) {
       return 'Your OpenAI API key is invalid. Double-check or generate a new key.';
     default:
       return 'Something went wrong while organizing. Try again or check the console for details.';
+  }
+}
+
+function bindNav() {
+  if (settingsNav) {
+    settingsNav.addEventListener('click', () => navigateWithTransition('settings.html'));
+  }
+  if (errorSettingsBtn) {
+    errorSettingsBtn.addEventListener('click', () => navigateWithTransition('settings.html'));
+  }
+  if (cancelledHomeBtn) {
+    cancelledHomeBtn.addEventListener('click', () => navigateWithTransition('page1.html'));
   }
 }
