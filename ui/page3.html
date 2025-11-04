@@ -60,6 +60,21 @@
     color:var(--accent);
     margin-top:12px;
   }
+  .status-pill.success{
+    background:rgba(95,224,193,0.1);
+    border:1px solid rgba(95,224,193,0.25);
+    color:var(--accent);
+  }
+  .status-pill.error{
+    background:rgba(255,80,80,0.12);
+    border:1px solid rgba(255,80,80,0.25);
+    color:#ff6b6b;
+  }
+  .status-pill.cancelled{
+    background:rgba(255,193,80,0.12);
+    border:1px solid rgba(255,193,80,0.2);
+    color:#ffb84d;
+  }
 
   .summary{
     text-align:center;
@@ -140,6 +155,33 @@
     color:var(--text-secondary);
     opacity:.6;
   }
+  .empty-state{
+    text-align:center;
+    font-size:14px;
+    color:var(--text-secondary);
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:var(--radius);
+    padding:20px 18px;
+  }
+  .toast{
+    position:fixed;
+    bottom:28px;
+    right:28px;
+    background:rgba(22,24,28,0.95);
+    color:var(--text-primary);
+    padding:10px 16px;
+    border-radius:999px;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .2s ease,transform .2s ease;
+    border:1px solid rgba(255,255,255,0.08);
+    font-size:13px;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateY(0);
+  }
 
   /* subtle confetti sparkles */
   @keyframes sparkle{
@@ -161,12 +203,12 @@
   <div class="panel">
     <div class="header">
       <div class="title">AI Bookmark Enhancer</div>
-      <div class="subtitle">Organization complete.</div>
-      <div class="status-pill">✓ Completed successfully</div>
+      <div class="subtitle" id="results-subtitle">Organization complete.</div>
+      <div class="status-pill success" id="status-pill">✓ Completed successfully</div>
     </div>
 
     <div class="summary">
-      <div class="metric">128 → 12</div>
+      <div class="metric" id="metric-count">0 → 0</div>
       <div class="metric-label">bookmarks organized into folders</div>
       <!-- sparkles -->
       <div class="sparkle" style="top:14%;left:18%;animation-delay:.1s"></div>
@@ -177,37 +219,13 @@
 
     <div class="divider"></div>
 
-    <div class="folders">
-      <div class="folder">
-        <div class="folder-name">📚 Learning & Articles</div>
-        <div class="folder-count">32 bookmarks</div>
-      </div>
-      <div class="folder">
-        <div class="folder-name">🧠 AI Tools & Research</div>
-        <div class="folder-count">21 bookmarks</div>
-      </div>
-      <div class="folder">
-        <div class="folder-name">💼 Work Resources</div>
-        <div class="folder-count">19 bookmarks</div>
-      </div>
-      <div class="folder">
-        <div class="folder-name">🎨 Design Inspiration</div>
-        <div class="folder-count">17 bookmarks</div>
-      </div>
-      <div class="folder">
-        <div class="folder-name">📰 News & Trends</div>
-        <div class="folder-count">24 bookmarks</div>
-      </div>
-      <div class="folder">
-        <div class="folder-name">🧩 Utilities</div>
-        <div class="folder-count">15 bookmarks</div>
-      </div>
-    </div>
+    <div class="folders" id="folders"></div>
+    <div class="empty-state" id="empty-state" hidden>No runs yet. Start organizing to view results.</div>
 
     <div class="actions">
-      <button class="btn-primary">Open in Bookmarks</button>
-      <button class="btn-secondary">Download Backup</button>
-      <button class="btn-secondary">Re-run Analysis</button>
+      <button class="btn-primary" id="open-bookmarks">Open in Bookmarks</button>
+      <button class="btn-secondary" id="download-backup">Download Backup</button>
+      <button class="btn-secondary" id="rerun-analysis">Re-run Analysis</button>
     </div>
 
     <div class="footer-tip">All changes saved locally. Backup available in Downloads folder.</div>

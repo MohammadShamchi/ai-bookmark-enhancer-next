@@ -61,6 +61,16 @@ ai-bookmark-enhancer-next/
     └── architecture.md
 ```
 
+## Manual Test Script
+
+1. Fresh install with no saved key: open the extension and confirm the hero metric reflects your bookmark count, the Organize button is disabled, and the Connect Key CTA routes to Settings.
+2. In Settings, paste an OpenAI API key, use Test Connection, wait for the toast, and confirm you are returned to the previous page with the Organize button enabled.
+3. Start a run and land on the progress screen; reload the page mid-run to confirm the bar, tasks, and percent sync from the background worker.
+4. Click Cancel during a run; verify the UI shows the cancelled state without redirecting and page3 displays the cancelled pill and disabled backup download.
+5. Start a fresh run, allow it to finish, and ensure page3 shows the dynamic `total → grouped` metric, success pill, and folder list sourced from the latest run meta.
+6. From Results, exercise each action button: open Chrome bookmarks, trigger Download Backup (two files saved), and use Re-run Analysis to return to the progress screen.
+7. Reset the key in Settings and try to start a run; confirm the error state appears inline on page2 and page1 remains gated without a key.
+
 ## Versions
 
 ### v1 → Legacy popup prototype (archived)

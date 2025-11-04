@@ -226,7 +226,7 @@
     <div class="error-panel" id="error-panel">
       <div class="error-title">Organization Failed</div>
       <div class="error-msg" id="error-msg">An error occurred. Please check your settings.</div>
-      <button class="error-btn" onclick="location.href='onboarding.html'">Connect API Key</button>
+      <button class="error-btn" onclick="location.href='settings.html'">Update API Key</button>
     </div>
 
     <div class="cancelled-panel" id="cancelled-panel">
@@ -241,15 +241,12 @@
         <span id="percent">0%</span>
       </div>
       <div class="progress"><div class="progress-bar" id="bar"></div></div>
-      <div class="stage" id="stage">Stage: Initializing</div>
+      <div class="stage" id="stage">Stage: Collecting bookmarks</div>
     </div>
 
-    <div class="tasks">
+    <div class="tasks" id="tasks-section">
       <h3>Task queue</h3>
-      <div class="task done"><span><span class="dot"></span>Export bookmarks</span><span>done</span></div>
-      <div class="task current"><span><span class="dot"></span>Build prompt</span><span>in progress</span></div>
-      <div class="task pending"><span><span class="dot"></span>Send to API</span><span>pending</span></div>
-      <div class="task pending"><span><span class="dot"></span>Apply structure</span><span>pending</span></div>
+      <div id="tasks-list"></div>
     </div>
 
     <div class="actions" id="actions-section">

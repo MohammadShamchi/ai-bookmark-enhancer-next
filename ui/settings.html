@@ -45,6 +45,26 @@
   .header { text-align: center; }
   .title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
   .subtitle { font-size: 14px; color: var(--text-secondary); }
+  .top-bar {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(95,224,193,0.05);
+  }
 
   .form-group {
     display: flex;
@@ -55,6 +75,9 @@
     font-size: 14px;
     font-weight: 500;
     color: var(--text-secondary);
+  }
+  .input-wrapper {
+    position: relative;
   }
   input[type="password"],
   input[type="text"] {
@@ -70,6 +93,20 @@
   input:focus {
     outline: none;
     border-color: var(--accent);
+  }
+  .toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .toggle-btn:hover {
+    color: var(--text-primary);
   }
 
   .actions {
@@ -113,6 +150,12 @@
     text-align: center;
     display: none;
   }
+  .status.info {
+    display: block;
+    background: rgba(95,224,193,0.08);
+    border: 1px solid rgba(95,224,193,0.15);
+    color: var(--accent);
+  }
   .status.success {
     display: block;
     background: rgba(95,224,193,0.1);
@@ -133,10 +176,31 @@
     opacity: 0.6;
     margin-top: 8px;
   }
+  .toast{
+    position:fixed;
+    bottom:28px;
+    right:28px;
+    background:rgba(22,24,28,0.95);
+    color:var(--text-primary);
+    padding:10px 16px;
+    border-radius:999px;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .2s ease,transform .2s ease;
+    border:1px solid rgba(255,255,255,0.08);
+    font-size:13px;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateY(0);
+  }
 </style>
 </head>
 <body>
   <div class="panel">
+    <div class="top-bar">
+      <button class="back-btn" id="backBtn">← Back</button>
+    </div>
     <div class="header">
       <div class="title">Settings</div>
       <div class="subtitle">Configure your OpenAI API key</div>
@@ -144,7 +208,10 @@
 
     <div class="form-group">
       <label for="apiKey">OpenAI API Key</label>
-      <input type="password" id="apiKey" placeholder="sk-...">
+      <div class="input-wrapper">
+        <input type="password" id="apiKey" placeholder="sk-...">
+        <button class="toggle-btn" id="toggleVisibility" type="button">Show</button>
+      </div>
     </div>
 
     <div class="actions">
