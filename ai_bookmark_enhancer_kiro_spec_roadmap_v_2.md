@@ -149,7 +149,26 @@ export const stepById = (id) => PROGRESS_STEPS.find(s => s.id===id) ?? PROGRESS_
 ---
 
 ### **v2.4 — Polish**
-- First‑run setup modal, ETA/time remaining, better empty states, taxonomy synonyms, subtle motion/microcopy polish.
+- First-run setup modal, ETA/time remaining, better empty states, taxonomy synonyms, subtle motion/microcopy polish.
+
+---
+
+### **v2.5 — Observability & Trust Layer** *(Awareness & Diagnostics)*
+**Goal:** Reassure users during long runs while collecting local-only diagnostics for product insight.
+
+**Tasks**
+- Progress ETA model: dynamic duration estimate and reassurance copy under the stage label.
+- Motion pulse + alive indicator: subtle progress-bar breathing effect between tick events.
+- Background persistence: keep service worker awake for long runs and raise completion notifications.
+- Local telemetry bucket: capture stage durations & key UI interactions (metric stored locally for dev review).
+- Diagnostic message channel: respond to `MSG.DIAG_STATUS` with snapshot `{ stage, percent, metrics, lastError }` for AI/dev tooling.
+
+**Acceptance**
+- Page2 shows ETA text and “you can keep browsing” reassurance copy after 5s.
+- Progress bar animates between updates (no frozen visuals after chunk 2/6).
+- Notification fires when run completes or fails (with counts).
+- `metrics` object persists locally after run and resets on next run.
+- Diagnostic request returns JSON snapshot consumable by Cursor/CLI.
 
 ---
 
@@ -314,4 +333,3 @@ medium.com/dev.to → docs_learning
 vercel.com/netlify.app → cloud_hosting
 stripe.com/paypal.com → payments
 ```
-

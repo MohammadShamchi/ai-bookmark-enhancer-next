@@ -278,6 +278,7 @@ function attachActions() {
   }
 
   updateRollbackAvailability();
+  setApplyButtonsDisabled(false);
 }
 
 async function hydrateApplyMeta() {
@@ -356,6 +357,8 @@ function handleApplyDone(meta) {
   }
   setApplyButtonsDisabled(false);
   updateRollbackAvailability();
+  renderApplyPreview(null);
+  hydrateApplyMeta();
   showToast('Structure applied. Opening new folder in Bookmark Manager…');
   if (meta?.rootId) {
     chrome.tabs.create({ url: `chrome://bookmarks/?id=${meta.rootId}` });
@@ -373,11 +376,14 @@ function handleRollbackDone() {
   updateApplyStatusText('Rollback complete');
   updateRollbackAvailability();
   setApplyButtonsDisabled(false);
+  renderApplyPreview(null);
+  hydrateApplyMeta();
   showToast('Last applied structure removed.');
 }
 
 function handleRollbackError(error) {
   setApplyButtonsDisabled(false);
+  updateApplyStatusText('Rollback failed');
   showToast(error || 'Rollback failed.');
 }
 
@@ -466,7 +472,10 @@ async function handlePreviewRequest() {
   if (previewBtn) previewBtn.disabled = true;
   updateApplyStatusText('Generating preview…');
   try {
-    const response = await sendRuntimeMessage({ type: MSG.APPLY_PREVIEW });
+    const response = await sendRuntimeMessage(
+      { type: MSG.APPLY_PREVIEW },
+      { timeout: 8000 }
+    );
     if (response?.preview) {
       renderApplyPreview(response.preview);
       updateApplyStatusText('Preview ready');
@@ -488,9 +497,16 @@ async function startApply() {
   setApplyButtonsDisabled(true);
   updateApplyStatusText('Starting apply…');
   try {
-    const response = await sendRuntimeMessage({ type: MSG.APPLY_START });
-    if (response?.ok === false && response?.reason === 'ALREADY_APPLYING') {
-      showToast('Apply already in progress.');
+    const response = await sendRuntimeMessage(
+      { type: MSG.APPLY_START },
+      { timeout: 4000 }
+    );
+    if (response?.ok === false) {
+      if (response?.reason === 'ALREADY_APPLYING') {
+        showToast('Apply already in progress.');
+      } else {
+        throw new Error(response?.error || 'Failed to start apply.');
+      }
     }
   } catch (error) {
     console.error('[page3] Failed to start apply', error);
@@ -504,7 +520,13 @@ async function startRollback() {
   setApplyButtonsDisabled(true);
   updateApplyStatusText('Rolling back…');
   try {
-    await sendRuntimeMessage({ type: MSG.ROLLBACK_START });
+    const response = await sendRuntimeMessage(
+      { type: MSG.ROLLBACK_START },
+      { timeout: 4000 }
+    );
+    if (response?.ok === false) {
+      throw new Error(response?.error || 'Failed to start rollback.');
+    }
   } catch (error) {
     console.error('[page3] Failed to start rollback', error);
     showToast('Unable to rollback.');
