@@ -1,5 +1,6 @@
 import { MSG } from '../lib/messages.js';
 import { getOrganized, getRunMeta } from '../lib/storage.js';
+import { sendRuntimeMessage } from '../lib/runtime_bus.js';
 
 const statusPill = document.getElementById('status-pill');
 const subtitleEl = document.getElementById('results-subtitle');
@@ -133,7 +134,7 @@ function attachActions(runMeta) {
       downloadBackupBtn.disabled = true;
       downloadBackupBtn.textContent = 'Preparing...';
       try {
-        const response = await chrome.runtime.sendMessage({ type: MSG.DOWNLOAD_LATEST });
+        const response = await sendRuntimeMessage({ type: MSG.DOWNLOAD_LATEST });
         if (!response?.ok) {
           throw new Error(response?.error || 'FAILED');
         }
@@ -157,7 +158,7 @@ function attachActions(runMeta) {
       rerunBtn.disabled = true;
       rerunBtn.textContent = 'Starting...';
       try {
-        const result = await chrome.runtime.sendMessage({ type: MSG.START_ORGANIZE });
+        const result = await sendRuntimeMessage({ type: MSG.START_ORGANIZE });
         if (result?.ok || result?.reason === 'ALREADY_RUNNING') {
           location.href = 'page2.html';
         } else if (result?.reason === 'MISSING_KEY') {

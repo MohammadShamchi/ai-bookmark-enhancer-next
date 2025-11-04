@@ -1,5 +1,6 @@
 import { MSG } from '../lib/messages.js';
 import { PROGRESS_STEPS } from '../lib/progress_steps.js';
+import { sendRuntimeMessage } from '../lib/runtime_bus.js';
 
 const barEl = document.getElementById('bar');
 const percentEl = document.getElementById('percent');
@@ -31,14 +32,21 @@ function bindCancel() {
   if (!cancelBtn) return;
   cancelBtn.addEventListener('click', async () => {
     cancelBtn.disabled = true;
+    const original = cancelBtn.textContent;
     cancelBtn.textContent = 'Cancelling...';
-    await chrome.runtime.sendMessage({ type: MSG.ORGANIZE_CANCELLED });
+    try {
+      await sendRuntimeMessage({ type: MSG.ORGANIZE_CANCELLED });
+    } catch (error) {
+      console.error('[page2] Failed to send cancel request', error);
+      cancelBtn.disabled = false;
+      cancelBtn.textContent = original;
+    }
   });
 }
 
 async function hydrateFromSync() {
   try {
-    const response = await chrome.runtime.sendMessage({ type: MSG.PROGRESS_SYNC });
+    const response = await sendRuntimeMessage({ type: MSG.PROGRESS_SYNC });
     if (!response?.runMeta) {
       location.replace('page1.html');
       return;

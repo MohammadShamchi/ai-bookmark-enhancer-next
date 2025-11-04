@@ -4,7 +4,8 @@ import { readBookmarks } from './lib/bookmarks.js';
 import { exportJson, exportHtml, downloadLatest } from './lib/backup.js';
 import { categorizeBookmarks } from './lib/ai_client.js';
 import { mergeSuggestions } from './lib/organizer.js';
-import { setOrganized, setRunMeta, getRunMeta, clearRunMeta } from './lib/storage.js';
+import { setOrganized, setRunMeta, getRunMeta } from './lib/storage.js';
+import { emitRuntimeMessage, addRuntimeMessageListener } from './lib/runtime_bus.js';
 
 // Open full-screen tab when extension icon is clicked
 chrome.action.onClicked.addListener(() => {
@@ -22,53 +23,46 @@ let lastProgress = {
 let lastFlatList = [];
 let currentRunMeta = null;
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+addRuntimeMessageListener((message) => {
   if (!message?.type) {
-    return false;
+    return undefined;
   }
 
   if (message.type === MSG.START_ORGANIZE) {
-    (async () => {
-      const result = await startOrganize();
-      sendResponse(result);
-    })();
-    return true;
+    return startOrganize();
   }
 
   if (message.type === MSG.PROGRESS_SYNC) {
-    (async () => {
+    return (async () => {
       const runMeta = await getRunMeta();
-      sendResponse({
+      return {
         progress: lastProgress,
         runMeta,
         isRunning,
         steps: PROGRESS_STEPS,
-      });
+      };
     })();
-    return true;
   }
 
   if (message.type === MSG.ORGANIZE_CANCELLED) {
-    (async () => {
+    return (async () => {
       await handleCancel();
-      sendResponse({ ok: true });
+      return { ok: true };
     })();
-    return true;
   }
 
   if (message.type === MSG.DOWNLOAD_LATEST) {
-    (async () => {
+    return (async () => {
       try {
         const result = await handleDownloadLatest();
-        sendResponse({ ok: true, result });
+        return { ok: true, result };
       } catch (error) {
-        sendResponse({ ok: false, error: error.message });
+        return { ok: false, error: error.message };
       }
     })();
-    return true;
   }
 
-  return false;
+  return undefined;
 });
 
 async function startOrganize() {
@@ -101,7 +95,7 @@ async function startOrganize() {
       endedAt: Date.now(),
       errorReason: 'MISSING_KEY',
     });
-    safeSend({ type: MSG.ORGANIZE_ERROR, reason: 'MISSING_KEY' });
+    emitRuntimeMessage({ type: MSG.ORGANIZE_ERROR, reason: 'MISSING_KEY' });
     resetState();
     return { ok: false, reason: 'MISSING_KEY' };
   }
@@ -147,7 +141,7 @@ async function startOrganize() {
         grouped: groupedCount,
       },
     });
-    safeSend({ type: MSG.ORGANIZE_DONE });
+    emitRuntimeMessage({ type: MSG.ORGANIZE_DONE });
     return { ok: true };
   } catch (error) {
     if (error.message === 'CANCELLED') {
@@ -155,7 +149,7 @@ async function startOrganize() {
         status: 'cancelled',
         endedAt: Date.now(),
       });
-      safeSend({ type: MSG.ORGANIZE_CANCELLED });
+      emitRuntimeMessage({ type: MSG.ORGANIZE_CANCELLED });
       return { ok: false, reason: 'CANCELLED' };
     }
 
@@ -165,7 +159,7 @@ async function startOrganize() {
       endedAt: Date.now(),
       errorReason: reason,
     });
-    safeSend({ type: MSG.ORGANIZE_ERROR, reason });
+    emitRuntimeMessage({ type: MSG.ORGANIZE_ERROR, reason });
     return { ok: false, reason };
   } finally {
     resetState();
@@ -181,7 +175,7 @@ async function handleCancel() {
       status: 'cancelled',
       endedAt: Date.now(),
     });
-    safeSend({ type: MSG.ORGANIZE_CANCELLED });
+    emitRuntimeMessage({ type: MSG.ORGANIZE_CANCELLED });
   }
 }
 
@@ -196,15 +190,7 @@ function tick(stageId) {
     percent: step.percent,
     label: step.label,
   };
-  safeSend({ type: MSG.PROGRESS_TICK, ...lastProgress });
-}
-
-function safeSend(msg) {
-  try {
-    chrome.runtime.sendMessage(msg);
-  } catch (error) {
-    console.warn('[background] Failed to send message', error);
-  }
+  emitRuntimeMessage({ type: MSG.PROGRESS_TICK, ...lastProgress });
 }
 
 function countGrouped(organized) {

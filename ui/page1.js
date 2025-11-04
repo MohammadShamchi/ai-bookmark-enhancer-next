@@ -1,5 +1,6 @@
 import { MSG } from '../lib/messages.js';
 import { readBookmarks } from '../lib/bookmarks.js';
+import { sendRuntimeMessage } from '../lib/runtime_bus.js';
 
 const organizeBtn = document.getElementById('organize-btn');
 const connectBtn = document.getElementById('connect-key');
@@ -35,7 +36,7 @@ async function hydrateKeyState() {
 
 async function resumeIfRunning() {
   try {
-    const response = await chrome.runtime.sendMessage({ type: MSG.PROGRESS_SYNC });
+    const response = await sendRuntimeMessage({ type: MSG.PROGRESS_SYNC });
     if (response?.runMeta?.status === 'running' || response?.isRunning) {
       location.replace('page2.html');
     }
@@ -50,7 +51,7 @@ function bindEvents() {
       if (organizeBtn.disabled) return;
       setOrganizeLoading(true);
       try {
-        const result = await chrome.runtime.sendMessage({ type: MSG.START_ORGANIZE });
+        const result = await sendRuntimeMessage({ type: MSG.START_ORGANIZE });
         if (result?.ok || result?.reason === 'ALREADY_RUNNING') {
           location.href = 'page2.html';
           return;
