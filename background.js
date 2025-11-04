@@ -23,8 +23,6 @@ let lastProgress = {
 let lastFlatList = [];
 let currentRunMeta = null;
 
-await restoreRunState();
-
 addRuntimeMessageListener((message) => {
   if (!message?.type) {
     return undefined;
@@ -262,3 +260,5 @@ async function restoreRunState() {
     console.warn('[background] Failed to restore run state', error);
   }
 }
+
+restoreRunState();
