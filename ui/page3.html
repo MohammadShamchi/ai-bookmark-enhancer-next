@@ -197,6 +197,14 @@
     background:rgba(255,255,255,0.1);
     color:var(--accent);
   }
+  .btn-danger{
+    background:rgba(255,80,80,0.18);
+    color:#ff6b6b;
+  }
+  .btn-danger:hover{
+    background:rgba(255,80,80,0.28);
+    color:#ffd3d3;
+  }
 
   .footer-tip{
     text-align:center;
@@ -230,6 +238,71 @@
   .toast.show{
     opacity:1;
     transform:translateY(0);
+  }
+
+  .apply-card{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:var(--radius);
+    padding:20px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .apply-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .apply-title{
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .apply-status-text{
+    font-size:13px;
+    color:var(--text-secondary);
+  }
+  .apply-buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .apply-buttons button{
+    flex:1;
+    min-width:160px;
+  }
+  .apply-meta{
+    font-size:13px;
+    color:var(--text-secondary);
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .apply-sample{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    gap:8px;
+  }
+  .apply-sample li{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:13px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .apply-sample .sample-folder{
+    color:var(--accent);
+    font-weight:500;
+  }
+  .apply-sample .sample-url{
+    color:var(--text-secondary);
+    word-break:break-all;
   }
 
   .modal-backdrop{
@@ -341,16 +414,30 @@
       <button class="btn-secondary" id="rerun-analysis">Re-run Analysis</button>
     </div>
 
+    <div class="apply-card" id="apply-card">
+      <div class="apply-header">
+        <div class="apply-title">Apply structure (non-destructive)</div>
+        <div class="apply-status-text" id="apply-status">Idle</div>
+      </div>
+      <div class="apply-buttons">
+        <button class="btn-secondary" id="preview-apply">Preview apply</button>
+        <button class="btn-primary" id="apply-structure">Apply structure</button>
+        <button class="btn-danger" id="rollback-apply">Rollback last apply</button>
+      </div>
+      <div class="apply-meta" id="apply-meta" hidden></div>
+      <ul class="apply-sample" id="apply-sample" hidden></ul>
+    </div>
+
     <div class="footer-tip">All changes saved locally. Backup available in Downloads folder.</div>
   </div>
   <div class="modal-backdrop" id="confirm-modal" hidden>
     <div class="modal">
       <button class="modal-close" id="close-modal" aria-label="Close modal">×</button>
-      <div class="modal-title">Start a new analysis?</div>
-      <div class="modal-body">This will replace the current results with a fresh AI run. Your previous backups remain in Downloads.</div>
+      <div class="modal-title" id="modal-title">Start a new analysis?</div>
+      <div class="modal-body" id="modal-body">This will replace the current results with a fresh AI run. Your previous backups remain in Downloads.</div>
       <div class="modal-actions">
-        <button class="btn-secondary" id="cancel-rerun">Not now</button>
-        <button class="btn-primary" id="confirm-rerun">Yes, start over</button>
+        <button class="btn-secondary" id="modal-cancel">Not now</button>
+        <button class="btn-primary" id="modal-confirm">Confirm</button>
       </div>
     </div>
   </div>

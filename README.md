@@ -25,6 +25,7 @@ AI Bookmark Enhancer v2 is a complete rebuild of the bookmark management extensi
 - ✅ **Manifest V3 compliant** with proper service worker architecture
 - 🔒 **CSP-safe implementation** using external scripts only
 - 📊 **Progress tracking** and onboarding for new users
+- 🗂 **Non-destructive apply & rollback** for AI-organized folders
 
 ## Installation & Testing
 
@@ -45,6 +46,7 @@ ai-bookmark-enhancer-next/
 ├── background.js          # Service worker
 ├── lib/                   # Shared utilities
 │   ├── ai_client.js       # AI categorization logic
+│   ├── apply.js           # Non-destructive apply & rollback helpers
 │   ├── backup.js          # Export/import functionality
 │   ├── bookmarks.js       # Bookmark reading utilities
 │   ├── messages.js        # Message constants
@@ -68,8 +70,11 @@ ai-bookmark-enhancer-next/
 3. Start a run and land on the progress screen; reload the page mid-run to confirm the bar, tasks, and percent sync from the background worker.
 4. Click Cancel during a run; verify the UI shows the cancelled state without redirecting and page3 displays the cancelled pill and disabled backup download.
 5. Start a fresh run, allow it to finish, and ensure page3 shows the dynamic `total → grouped` metric, success pill, and folder list sourced from the latest run meta.
-6. From Results, exercise each action button: open Chrome bookmarks, trigger Download Backup (two files saved), and use Re-run Analysis to return to the progress screen.
-7. Reset the key in Settings and try to start a run; confirm the error state appears inline on page2 and page1 remains gated without a key.
+6. From Results, generate an apply preview; confirm folder/bookmark counts and that a sample of bookmarks is shown.
+7. Apply the structure and verify a new `AI Organized (...)` root appears in Bookmark Manager with duplicate copies (original folders untouched). Run Apply again to confirm a new timestamped root is created.
+8. Use “Open in Bookmarks” to deep-link into the latest applied root, then use “Rollback last apply” and confirm only that new root is removed.
+9. Exercise the remaining actions: trigger Download Backup (two files saved) and use Re-run Analysis to return to the progress screen.
+10. Reset the key in Settings and try to start a run; confirm the error state appears inline on page2 and page1 remains gated without a key.
 
 ## Versions
 

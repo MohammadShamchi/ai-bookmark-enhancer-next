@@ -4,7 +4,16 @@ import { readBookmarks } from './lib/bookmarks.js';
 import { exportJson, exportHtml, downloadLatest } from './lib/backup.js';
 import { categorizeBookmarks } from './lib/ai_client.js';
 import { mergeSuggestions } from './lib/organizer.js';
-import { setOrganized, setRunMeta, getRunMeta } from './lib/storage.js';
+import {
+  getOrganized,
+  setOrganized,
+  setRunMeta,
+  getRunMeta,
+  setLastApplyMeta,
+  getLastApplyMeta,
+  clearLastApplyMeta,
+} from './lib/storage.js';
+import { applyStructure, previewApply, rollbackApply } from './lib/apply.js';
 import { emitRuntimeMessage, addRuntimeMessageListener } from './lib/runtime_bus.js';
 
 // Open full-screen tab when extension icon is clicked
@@ -23,6 +32,8 @@ let lastProgress = {
 let lastFlatList = [];
 let currentRunMeta = null;
 let aiStatus = createDefaultAiStatus();
+let applying = false;
+let applyProgress = { stage: 'idle', percent: 0 };
 
 addRuntimeMessageListener((message) => {
   if (!message?.type) {
@@ -43,6 +54,75 @@ addRuntimeMessageListener((message) => {
         steps: PROGRESS_STEPS,
       };
     })();
+  }
+
+  if (message.type === MSG.APPLY_PREVIEW) {
+    return (async () => {
+      const organized = await getOrganized();
+      if (!organized?.folders?.length) {
+        throw new Error('No organized results to preview. Run the enhancer first.');
+      }
+      const preview = await previewApply(organized);
+      emitApplyProgress('preview', 5, { label: 'Preview ready', preview });
+      return { ok: true, preview };
+    })();
+  }
+
+  if (message.type === MSG.APPLY_START) {
+    if (applying) {
+      return { ok: false, reason: 'ALREADY_APPLYING' };
+    }
+    applying = true;
+    emitApplyProgress('init', 5, { label: 'Preparing apply' });
+    (async () => {
+      try {
+        const organized = await getOrganized();
+        if (!organized?.folders?.length) {
+          throw new Error('No organized results to apply. Run analysis first.');
+        }
+        const meta = await applyStructure({
+          organized,
+          parentId: '1',
+          batchSize: message?.batchSize ?? 150,
+          onProgress: (payload = {}) => {
+            const { stage = 'apply', percent = applyProgress.percent, label, preview, ...rest } = payload;
+            emitApplyProgress(stage, percent, { label, preview, ...rest });
+          },
+        });
+        await setLastApplyMeta(meta);
+        emitApplyProgress('finalize', 100, { label: 'Apply complete', meta });
+        emitRuntimeMessage({ type: MSG.APPLY_DONE, meta });
+      } catch (error) {
+        emitApplyProgress('error', applyProgress.percent, { label: error?.message ?? 'Apply failed' });
+        emitRuntimeMessage({ type: MSG.APPLY_ERROR, error: error?.message ?? 'Apply failed unexpectedly.' });
+      } finally {
+        applying = false;
+      }
+    })();
+    return { ok: true };
+  }
+
+  if (message.type === MSG.ROLLBACK_START) {
+    (async () => {
+      try {
+        if (applying) {
+          throw new Error('Apply operation in progress. Wait until it completes.');
+        }
+        const meta = await getLastApplyMeta();
+        if (!meta?.rootId) {
+          throw new Error('No previous apply to rollback.');
+        }
+        emitApplyProgress('rollback', 10, { label: 'Removing applied folder' });
+        await rollbackApply(meta.rootId);
+        await clearLastApplyMeta();
+        emitApplyProgress('idle', 0, { label: 'Rollback complete' });
+        emitRuntimeMessage({ type: MSG.ROLLBACK_DONE });
+      } catch (error) {
+        emitApplyProgress('error', applyProgress.percent, { label: 'Rollback failed' });
+        emitRuntimeMessage({ type: MSG.ROLLBACK_ERROR, error: error?.message ?? 'Rollback failed.' });
+      }
+    })();
+    return { ok: true };
   }
 
   if (message.type === MSG.REQUEST_STATUS) {
@@ -251,6 +331,11 @@ function tick(stageId, override = {}) {
 
   emitRuntimeMessage(message);
   void writeRunMeta(metaPatch);
+}
+
+function emitApplyProgress(stage, percent, extra = {}) {
+  applyProgress = { stage, percent };
+  emitRuntimeMessage({ type: MSG.APPLY_PROGRESS, stage, percent, ...extra });
 }
 
 function countGrouped(organized) {
