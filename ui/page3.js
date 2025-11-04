@@ -1,6 +1,6 @@
 import { MSG } from '../lib/messages.js';
-import { getOrganized, getRunMeta, getLastApplyMeta } from '../lib/storage.js';
 import { sendRuntimeMessage } from '../lib/runtime_bus.js';
+import { getLastApplyMeta, getOrganized, getRunMeta } from '../lib/storage.js';
 import { markPageReady, navigateWithTransition } from '../lib/ui.js';
 
 const statusPill = document.getElementById('status-pill');
@@ -67,7 +67,9 @@ function renderSummary(runMeta, organized) {
   const success = runMeta?.status === 'success';
 
   if (metricEl) {
-    metricEl.textContent = success ? `${total.toLocaleString()} → ${grouped.toLocaleString()}` : '—';
+    metricEl.textContent = success
+      ? `${total.toLocaleString()} → ${grouped.toLocaleString()}`
+      : '—';
   }
 
   updateStatusPill(runMeta);
@@ -87,9 +89,10 @@ function renderSummary(runMeta, organized) {
   }
 
   if (!success && emptyState) {
-    emptyState.textContent = runMeta.status === 'cancelled'
-      ? 'No changes were made. Re-run analysis whenever you are ready.'
-      : 'We could not complete this run. Check your API key and try again.';
+    emptyState.textContent =
+      runMeta.status === 'cancelled'
+        ? 'No changes were made. Re-run analysis whenever you are ready.'
+        : 'We could not complete this run. Check your API key and try again.';
     emptyState.hidden = false;
   }
 
@@ -117,7 +120,8 @@ function renderFolders(runMeta, organized) {
     foldersContainer.hidden = true;
     if (emptyState) {
       emptyState.hidden = false;
-      emptyState.textContent = 'No organized folders yet. Re-run analysis when ready.';
+      emptyState.textContent =
+        'No organized folders yet. Re-run analysis when ready.';
     }
     return;
   }
@@ -148,7 +152,8 @@ function renderIdleState() {
   if (metricEl) metricEl.textContent = '—';
   if (subtitleEl) subtitleEl.textContent = 'Run the organizer to see results.';
   if (emptyState) {
-    emptyState.textContent = 'No runs yet. Start organizing to view results here.';
+    emptyState.textContent =
+      'No runs yet. Start organizing to view results here.';
     emptyState.hidden = false;
   }
   if (foldersContainer) {
@@ -164,7 +169,9 @@ function renderIdleState() {
 
 function attachActions() {
   if (settingsNav) {
-    settingsNav.addEventListener('click', () => navigateWithTransition('settings.html'));
+    settingsNav.addEventListener('click', () =>
+      navigateWithTransition('settings.html')
+    );
   }
 
   if (openBookmarksBtn) {
@@ -173,9 +180,11 @@ function attachActions() {
         ? `chrome://bookmarks/?id=${state.lastApplyMeta.rootId}`
         : 'chrome://bookmarks';
       chrome.tabs.create({ url: targetUrl });
-      showToast(state.lastApplyMeta?.rootId
-        ? `Opened ${state.lastApplyMeta.rootName} in Bookmark Manager.`
-        : 'Bookmark Manager opened in a new tab.');
+      showToast(
+        state.lastApplyMeta?.rootId
+          ? `Opened ${state.lastApplyMeta.rootName} in Bookmark Manager.`
+          : 'Bookmark Manager opened in a new tab.'
+      );
     });
   }
 
@@ -186,7 +195,9 @@ function attachActions() {
       downloadBackupBtn.disabled = true;
       downloadBackupBtn.textContent = 'Preparing...';
       try {
-        const response = await sendRuntimeMessage({ type: MSG.DOWNLOAD_LATEST });
+        const response = await sendRuntimeMessage({
+          type: MSG.DOWNLOAD_LATEST,
+        });
         if (!response?.ok) {
           throw new Error(response?.error || 'FAILED');
         }
@@ -340,7 +351,8 @@ function handleRuntimeMessage(message) {
 
 function handleApplyProgress(message) {
   state.apply.stage = message.stage ?? state.apply.stage;
-  state.apply.percent = typeof message.percent === 'number' ? message.percent : state.apply.percent;
+  state.apply.percent =
+    typeof message.percent === 'number' ? message.percent : state.apply.percent;
   state.apply.label = message.label ?? state.apply.label;
   updateApplyStatusText(formatApplyStatus(state.apply));
   if (message.preview) {
@@ -442,7 +454,10 @@ function formatApplyStatus(progress) {
   };
   const label = progress.label || stageLabels[progress.stage] || 'Applying';
   if (typeof progress.percent === 'number') {
-    return `${label} — ${Math.min(100, Math.max(0, Math.round(progress.percent)))}%`;
+    return `${label} — ${Math.min(
+      100,
+      Math.max(0, Math.round(progress.percent))
+    )}%`;
   }
   return label;
 }
@@ -456,7 +471,9 @@ function openModal({ context, title, body, confirmLabel, variant }) {
   modalBody.textContent = body;
   modalConfirmBtn.textContent = confirmLabel ?? 'Confirm';
   modalConfirmBtn.classList.remove('btn-primary', 'btn-danger');
-  modalConfirmBtn.classList.add(variant === 'danger' ? 'btn-danger' : 'btn-primary');
+  modalConfirmBtn.classList.add(
+    variant === 'danger' ? 'btn-danger' : 'btn-primary'
+  );
   modal.removeAttribute('hidden');
   requestAnimationFrame(() => modal.classList.add('visible'));
 }

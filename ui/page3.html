@@ -320,6 +320,13 @@
     transition:opacity .2s ease;
     z-index:10;
   }
+  .modal-backdrop[hidden]{
+    display:none !important;
+    pointer-events:none;
+  }
+  .modal-backdrop:not(.visible){
+    pointer-events:none;
+  }
   .modal-backdrop.visible{
     opacity:1;
   }
