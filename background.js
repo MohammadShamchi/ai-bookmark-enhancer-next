@@ -23,6 +23,8 @@ let lastProgress = {
 let lastFlatList = [];
 let currentRunMeta = null;
 
+await restoreRunState();
+
 addRuntimeMessageListener((message) => {
   if (!message?.type) {
     return undefined;
@@ -36,7 +38,7 @@ addRuntimeMessageListener((message) => {
     return (async () => {
       const runMeta = await getRunMeta();
       return {
-        progress: lastProgress,
+        progress: lastProgress ?? runMeta?.progress ?? null,
         runMeta,
         isRunning,
         steps: PROGRESS_STEPS,
@@ -44,7 +46,7 @@ addRuntimeMessageListener((message) => {
     })();
   }
 
-  if (message.type === MSG.ORGANIZE_CANCELLED) {
+  if (message.type === MSG.ORGANIZE_CANCEL) {
     return (async () => {
       await handleCancel();
       return { ok: true };
@@ -74,19 +76,15 @@ async function startOrganize() {
   cancelRequested = false;
   aborter = new AbortController();
   lastFlatList = [];
-  lastProgress = {
-    stageId: 'read',
-    percent: 0,
-    label: stepById('read').label,
-  };
 
   currentRunMeta = {
     status: 'running',
     startedAt: Date.now(),
     stats: { total: 0, grouped: 0 },
     errorReason: null,
+    progress: lastProgress,
   };
-  await setRunMeta(currentRunMeta);
+  currentRunMeta = await setRunMeta(currentRunMeta);
 
   const { OPENAI_KEY } = await chrome.storage.local.get('OPENAI_KEY');
   if (!OPENAI_KEY) {
@@ -122,7 +120,10 @@ async function startOrganize() {
     }
 
     tick('ai');
-    const aiResult = await categorizeBookmarks(flatList, { signal: aborter.signal });
+    const aiResult = await categorizeBookmarks(flatList, {
+      signal: aborter.signal,
+      onProgress: (percent, label) => tick('ai', { percent, label }),
+    });
     if (cancelRequested) {
       throw new Error('CANCELLED');
     }
@@ -183,14 +184,21 @@ async function handleDownloadLatest() {
   return downloadLatest(lastFlatList.length ? lastFlatList : null);
 }
 
-function tick(stageId) {
+function tick(stageId, override = {}) {
   const step = stepById(stageId);
+  const rawPercent = typeof override.percent === 'number' ? override.percent : step.percent;
+  const percent = Math.max(0, Math.min(100, rawPercent));
+  const resolvedLabel =
+    typeof override.label === 'string' && override.label.trim().length
+      ? override.label
+      : step.label;
   lastProgress = {
     stageId,
-    percent: step.percent,
-    label: step.label,
+    percent,
+    label: resolvedLabel,
   };
   emitRuntimeMessage({ type: MSG.PROGRESS_TICK, ...lastProgress });
+  void writeRunMeta({ progress: lastProgress });
 }
 
 function countGrouped(organized) {
@@ -210,6 +218,12 @@ function countGrouped(organized) {
 
 async function writeRunMeta(patch) {
   const next = {
+    status: 'idle',
+    startedAt: null,
+    endedAt: null,
+    errorReason: null,
+    progress: lastProgress,
+    stats: { total: 0, grouped: 0 },
     ...(currentRunMeta ?? {}),
     ...patch,
     stats: {
@@ -217,13 +231,34 @@ async function writeRunMeta(patch) {
       ...(patch.stats ?? {}),
     },
   };
-  currentRunMeta = next;
-  await setRunMeta(next);
-  return next;
+  if (patch.progress) {
+    next.progress = { ...patch.progress };
+  }
+  const normalized = await setRunMeta(next);
+  currentRunMeta = normalized;
+  return normalized;
 }
 
 function resetState() {
   isRunning = false;
   cancelRequested = false;
   aborter = null;
+}
+
+async function restoreRunState() {
+  try {
+    const stored = await getRunMeta();
+    if (!stored) {
+      return;
+    }
+    currentRunMeta = stored;
+    if (stored?.progress) {
+      lastProgress = { ...stored.progress };
+    }
+    if (stored.status === 'running') {
+      isRunning = true;
+    }
+  } catch (error) {
+    console.warn('[background] Failed to restore run state', error);
+  }
 }

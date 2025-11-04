@@ -35,7 +35,7 @@ function bindCancel() {
     const original = cancelBtn.textContent;
     cancelBtn.textContent = 'Cancelling...';
     try {
-      await sendRuntimeMessage({ type: MSG.ORGANIZE_CANCELLED });
+      await sendRuntimeMessage({ type: MSG.ORGANIZE_CANCEL });
     } catch (error) {
       console.error('[page2] Failed to send cancel request', error);
       cancelBtn.disabled = false;

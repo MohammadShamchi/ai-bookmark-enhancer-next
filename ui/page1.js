@@ -20,9 +20,10 @@ async function init() {
 
 async function hydrateBookmarkCount() {
   try {
-    const { flatList } = await readBookmarks();
+    const { totals } = await readBookmarks();
     if (metricEl) {
-      metricEl.textContent = flatList.length.toLocaleString();
+      const total = totals?.total ?? 0;
+      metricEl.textContent = total.toLocaleString();
     }
   } catch (error) {
     console.error('[page1] Failed to read bookmarks:', error);
