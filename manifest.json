@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "AI Bookmark Enhancer",
+  "version": "1.0.0",
+  "description": "Organize and clean up your Chrome bookmarks using AI.",
+  "permissions": ["bookmarks", "storage", "downloads", "scripting", "activeTab"],
+  "host_permissions": ["https://api.openai.com/*"],
+  "options_page": "ui/settings.html",
+  "action": {
+    "default_title": "AI Bookmark Enhancer"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}

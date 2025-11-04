@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Bookmark Enhancer — Start</title>
+    <style>
+        :root {
+            --bg: #0E1013;
+            --surface: #16181C;
+            --border: #1F2226;
+            --accent: #5FE0C1;
+            --accent-dim: #3BB39A;
+            --text-primary: #ECEDEE;
+            --text-secondary: #A4A6A8;
+            --radius: 16px;
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Geist", system-ui, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 720px;
+            padding: 40px 48px 48px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .summary {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            padding: 24px 16px;
+        }
+
+        .metric {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .primary-btn {
+            align-self: center;
+            background: var(--accent);
+            color: #0E1013;
+            border: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 12px 26px;
+            cursor: pointer;
+            transition: all .15s ease;
+        }
+
+        .primary-btn:hover:not(:disabled) {
+            background: var(--accent-dim);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(95, 224, 193, 0.2);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            align-self: center;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 22px;
+            cursor: pointer;
+            transition: all .15s ease;
+        }
+
+        .secondary-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--accent);
+            background: rgba(95, 224, 193, 0.05);
+        }
+
+        .hint-text {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: -8px 0 0;
+        }
+
+        /* ------------------------------- */
+        /* Expandable sections */
+        .accordion {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 16px;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .accordion-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: -0.01em;
+            transition: color .15s ease;
+        }
+
+        .accordion-header:hover {
+            color: var(--accent);
+        }
+
+        .accordion-icon {
+            transition: transform .2s ease;
+            opacity: .6;
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(90deg);
+            opacity: 1;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease, opacity .25s ease;
+            opacity: 0;
+            color: var(--text-secondary);
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 300px;
+            opacity: 1;
+        }
+
+        .accordion-content p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 4px 0 10px;
+        }
+
+        .footer-tip {
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            margin-top: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: #0E1013;
+            padding: 12px 20px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(95, 224, 193, 0.4);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .panel {
+                padding: 28px 20px 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="panel">
+        <div class="header">
+            <div class="title">AI Bookmark Enhancer</div>
+            <div class="subtitle">Smart organization, zero clutter.</div>
+        </div>
+
+        <div class="summary">
+            <div class="metric">128</div>
+            <div class="metric-label">bookmarks detected</div>
+        </div>
+
+        <button id="organize-btn" class="primary-btn">Organize my bookmarks →</button>
+        <button id="connect-key" class="secondary-btn">Connect OpenAI Key</button>
+        <p id="key-hint" class="hint-text">You'll need an OpenAI API key to organize.</p>
+
+        <!-- Accordion -->
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>What happens next</span>
+                    <span class="accordion-icon">›</span>
+                </div>
+                <div class="accordion-content">
+                    <p>Before organizing, we’ll create a complete HTML backup of your bookmarks so you can restore them
+                        anytime.</p>
+                    <p>Your data never leaves your computer without your explicit consent. The AI model only receives
+                        folder titles, URLs, and structure — never notes or passwords.</p>
+                    <p>Estimated cost for this session is <b>$0.006 per run</b>.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>Transparency</span>
+                    <span class="accordion-icon">›</span>
+                </div>
+                <div class="accordion-content">
+                    <p>This project uses OpenAI’s API under your own API key. You can inspect the full JSON payload
+                        before sending, ensuring 100% control and privacy.</p>
+                    <p>You can stop the process at any moment, and your backup will remain untouched.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-tip">No data is sent until you approve.</div>
+    </div>
+
+    <script type="module" src="./page1.js"></script>
+</body>
+
+</html>

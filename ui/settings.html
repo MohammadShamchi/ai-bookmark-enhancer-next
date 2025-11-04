@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Bookmark Enhancer — Settings</title>
+<style>
+  :root {
+    --bg: #0E1013;
+    --surface: #16181C;
+    --border: rgba(255,255,255,0.05);
+    --accent: #5FE0C1;
+    --accent-dim: #3BB39A;
+    --text-primary: #ECEDEE;
+    --text-secondary: #A4A6A8;
+    --radius: 16px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 32px 20px;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 580px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+    padding: 40px 48px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .header { text-align: center; }
+  .title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: var(--text-secondary); }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  input[type="password"],
+  input[type="text"] {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 12px 16px;
+    transition: border-color .15s ease;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  button {
+    border: none;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0E1013;
+    flex: 1;
+  }
+  .btn-primary:hover {
+    background: var(--accent-dim);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(95,224,193,0.25);
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-secondary);
+    flex: 1;
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+  }
+
+  .status {
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-align: center;
+    display: none;
+  }
+  .status.success {
+    display: block;
+    background: rgba(95,224,193,0.1);
+    border: 1px solid rgba(95,224,193,0.3);
+    color: var(--accent);
+  }
+  .status.error {
+    display: block;
+    background: rgba(255,80,80,0.1);
+    border: 1px solid rgba(255,80,80,0.3);
+    color: #ff6b6b;
+  }
+
+  .footer-tip {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    opacity: 0.6;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="header">
+      <div class="title">Settings</div>
+      <div class="subtitle">Configure your OpenAI API key</div>
+    </div>
+
+    <div class="form-group">
+      <label for="apiKey">OpenAI API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-...">
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="saveBtn">Save Key</button>
+      <button class="btn-secondary" id="testBtn">Test Connection</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="footer-tip">Your API key is stored locally and never shared.</div>
+  </div>
+
+<script type="module" src="./settings.js"></script>
+</body>
+</html>

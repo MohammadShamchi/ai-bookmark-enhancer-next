@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Connect OpenAI Key — AI Bookmark Enhancer</title>
+    <style>
+        :root {
+            --bg: #0E1013;
+            --surface: #16181C;
+            --border: #1F2226;
+            --accent: #5FE0C1;
+            --accent-dim: #3BB39A;
+            --text-primary: #ECEDEE;
+            --text-secondary: #A4A6A8;
+            --radius: 16px;
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Geist", system-ui, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 520px;
+            padding: 40px 48px 48px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: var(--font);
+            transition: all .15s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .primary-btn {
+            align-self: stretch;
+            background: var(--accent);
+            color: #0E1013;
+            border: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 12px 26px;
+            cursor: pointer;
+            transition: all .15s ease;
+        }
+
+        .primary-btn:hover:not(:disabled) {
+            background: var(--accent-dim);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(95, 224, 193, 0.2);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: rgba(95, 224, 193, 0.08);
+            border: 1px solid rgba(95, 224, 193, 0.15);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .info-box a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .info-box a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .panel {
+                padding: 28px 20px 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="panel">
+        <div class="header">
+            <div class="title">Connect Your OpenAI Key</div>
+            <div class="subtitle">This key enables AI-powered bookmark organization.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="key">OpenAI API Key</label>
+            <input type="password" id="key" placeholder="sk-proj-..." autocomplete="off" />
+        </div>
+
+        <button id="save" class="primary-btn">Save and Continue</button>
+
+        <div class="info-box">
+            Your key is stored locally in your browser and never shared. Get your key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Dashboard</a>.
+        </div>
+    </div>
+
+    <script type="module" src="./onboarding.js"></script>
+</body>
+
+</html>

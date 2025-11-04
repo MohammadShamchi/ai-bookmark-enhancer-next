@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "AI Bookmark Enhancer",
+  "description": "Full-screen UI with AI chunk categorization and real backups.",
+  "version": "2.0.0",
+  "action": { "default_title": "Open AI Bookmark Enhancer" },
+  "permissions": ["bookmarks", "storage", "scripting", "activeTab"],
+  "background": { "service_worker": "background.js" }
+}
+

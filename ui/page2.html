@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Bookmark Enhancer — Processing</title>
+<style>
+  :root {
+    --bg: #0E1013;
+    --glass: rgba(22,24,28,0.6);
+    --border: rgba(255,255,255,0.05);
+    --accent: #5FE0C1;
+    --accent-dim: #3BB39A;
+    --text-primary: #ECEDEE;
+    --text-secondary: #A4A6A8;
+    --radius: 16px;
+    --font: -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background: radial-gradient(circle at 50% -20%,rgba(95,224,193,.12),rgba(14,16,19,1) 60%);
+    color:var(--text-primary);
+    font-family:var(--font);
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:32px 20px;
+  }
+
+  .panel{
+    width:100%;
+    max-width:700px;
+    border-radius:var(--radius);
+    border:1px solid var(--border);
+    backdrop-filter:blur(28px) saturate(1.3);
+    background:var(--glass);
+    box-shadow:0 12px 40px rgba(0,0,0,0.45);
+    padding:40px 48px 48px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+    animation:fadeUp .4s ease-out;
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+  .header{text-align:center;}
+  .title{font-size:22px;font-weight:600;letter-spacing:-0.02em;margin-bottom:4px;}
+  .subtitle{font-size:14px;color:var(--text-secondary);}
+
+  /* Progress Card */
+  .status{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:var(--radius);
+    padding:20px 24px 24px;
+  }
+  .status-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    font-size:14px;
+  }
+  .status-header span{opacity:.7;}
+  .progress{
+    height:8px;
+    background:rgba(255,255,255,0.05);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress-bar{
+    height:100%;
+    width:0%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,var(--accent),#9FF4E2);
+    box-shadow:0 0 8px rgba(95,224,193,.3);
+    transition:width .4s ease;
+  }
+  .stage{
+    margin-top:10px;
+    font-size:13px;
+    color:var(--text-secondary);
+  }
+
+  /* Task queue */
+  .tasks{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:var(--radius);
+    padding:18px 20px;
+  }
+  .tasks h3{
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:8px;
+  }
+  .task{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:14px;
+    color:var(--text-secondary);
+    padding:4px 0;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    margin-right:8px;display:inline-block;
+  }
+  .done .dot{background:var(--accent);}
+  .current .dot{background:#fff;}
+  .pending .dot{background:#333;}
+  .done span,.pending span,.current span{display:flex;align-items:center;}
+
+  .actions{
+    display:flex;
+    justify-content:center;
+  }
+  .stop-btn{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--text-secondary);
+    font-size:14px;
+    padding:8px 22px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .stop-btn:hover{
+    background:rgba(255,80,80,0.15);
+    color:#ff6b6b;
+    border-color:rgba(255,80,80,0.25);
+  }
+
+  .footer-tip{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--text-secondary);
+    opacity:.6;
+  }
+
+  .error-panel{
+    background:rgba(255,80,80,0.12);
+    border:1px solid rgba(255,80,80,0.25);
+    border-radius:var(--radius);
+    padding:20px 24px;
+    display:none;
+  }
+  .error-panel.visible{display:block;}
+  .error-title{
+    font-size:16px;
+    font-weight:600;
+    color:#ff6b6b;
+    margin-bottom:8px;
+  }
+  .error-msg{
+    font-size:14px;
+    color:var(--text-secondary);
+    margin-bottom:16px;
+    line-height:1.5;
+  }
+  .error-btn{
+    background:var(--accent);
+    color:#0E1013;
+    border:none;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:500;
+    padding:10px 22px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .error-btn:hover{
+    background:var(--accent-dim);
+    transform:translateY(-1px);
+  }
+
+  .cancelled-panel{
+    background:rgba(255,193,80,0.12);
+    border:1px solid rgba(255,193,80,0.25);
+    border-radius:var(--radius);
+    padding:20px 24px;
+    display:none;
+    text-align:center;
+  }
+  .cancelled-panel.visible{display:block;}
+  .cancelled-title{
+    font-size:16px;
+    font-weight:600;
+    color:#ffb84d;
+    margin-bottom:8px;
+  }
+  .cancelled-msg{
+    font-size:14px;
+    color:var(--text-secondary);
+    margin-bottom:16px;
+    line-height:1.5;
+  }
+  .home-btn{
+    background:var(--accent);
+    color:#0E1013;
+    border:none;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:500;
+    padding:10px 22px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .home-btn:hover{
+    background:var(--accent-dim);
+    transform:translateY(-1px);
+  }
+
+  @media(max-width:640px){.panel{padding:28px 22px 36px;}}
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="header">
+      <div class="title">AI Bookmark Enhancer</div>
+      <div class="subtitle">Organizing bookmarks in progress...</div>
+    </div>
+
+    <div class="error-panel" id="error-panel">
+      <div class="error-title">Organization Failed</div>
+      <div class="error-msg" id="error-msg">An error occurred. Please check your settings.</div>
+      <button class="error-btn" onclick="location.href='onboarding.html'">Connect API Key</button>
+    </div>
+
+    <div class="cancelled-panel" id="cancelled-panel">
+      <div class="cancelled-title">Cancelled</div>
+      <div class="cancelled-msg">Organization was stopped. No changes were made to your bookmarks.</div>
+      <button class="home-btn" onclick="location.href='page1.html'">Back to Home</button>
+    </div>
+
+    <div class="status" id="status-section">
+      <div class="status-header">
+        <span>Processing</span>
+        <span id="percent">0%</span>
+      </div>
+      <div class="progress"><div class="progress-bar" id="bar"></div></div>
+      <div class="stage" id="stage">Stage: Initializing</div>
+    </div>
+
+    <div class="tasks">
+      <h3>Task queue</h3>
+      <div class="task done"><span><span class="dot"></span>Export bookmarks</span><span>done</span></div>
+      <div class="task current"><span><span class="dot"></span>Build prompt</span><span>in progress</span></div>
+      <div class="task pending"><span><span class="dot"></span>Send to API</span><span>pending</span></div>
+      <div class="task pending"><span><span class="dot"></span>Apply structure</span><span>pending</span></div>
+    </div>
+
+    <div class="actions" id="actions-section">
+      <button class="stop-btn" id="cancel-btn">Cancel run</button>
+    </div>
+
+    <div class="footer-tip">Processing locally — no data leaves your computer.</div>
+  </div>
+
+<script type="module" src="./page2.js"></script>
+</body>
+</html>
