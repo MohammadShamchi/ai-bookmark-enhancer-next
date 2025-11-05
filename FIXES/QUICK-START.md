@@ -8,8 +8,8 @@
 
 I've created a complete fix documentation system with:
 
-✅ **8 core documents** in the `/FIXES` directory
-✅ **7 P0 critical issue** files (high priority)
+✅ **11 files total** in the `/FIXES` directory (4 core docs + 7 P0 issues)
+✅ **7 P0 critical issues** (high priority implementation tasks)
 ✅ **Full context** and implementation details for each
 ✅ **Dependency tracking** to avoid conflicts
 ✅ **Ready for parallel execution** with multiple Cursor agents
@@ -80,15 +80,13 @@ Agent 6: P0-04 (lib/ai_client.js, ui/settings.*)
 
 ## 📁 Files You Need to Know About
 
-### Must Read First (Every Agent)
-- **`FIXES/00-CODEBASE-CONTEXT.md`** ← Start here ALWAYS
+### Core Documentation (4 files)
+- **`FIXES/00-CODEBASE-CONTEXT.md`** ← START HERE ALWAYS - Complete architecture reference
+- **`FIXES/README.md`** ← Full guide on using these documentation files
+- **`FIXES/QUICK-START.md`** ← You are here! Quick reference guide
+- **`FIXES/DEPENDENCIES.md`** ← Conflict matrix & execution order
 
-### Planning & Coordination
-- **`FIXES/README.md`** ← Full guide on using these files
-- **`FIXES/DEPENDENCIES.md`** ← Avoid conflicts, see what blocks what
-- **`FIXES/QUICK-START.md`** ← You are here!
-
-### Issue Files (P0 - Critical)
+### P0 Issue Files (7 critical priority)
 | File | What It Fixes | Time | Can Start Now? |
 |------|---------------|------|----------------|
 | `P0-01-sequential-processing.md` | 3x faster AI processing | 2-3h | ✅ YES |
@@ -98,6 +96,8 @@ Agent 6: P0-04 (lib/ai_client.js, ui/settings.*)
 | `P0-05-ai-consistency.md` | Same bookmarks → same results | 2-3h | ❌ After P0-01 |
 | `P0-06-processing-feedback.md` | Show detailed progress | 1-2h | ✅ YES |
 | `P0-07-apply-performance.md` | 5-6x faster applying | 2-3h | ✅ YES |
+
+**Total: 11 files (4 core documentation + 7 P0 issues)**
 
 ---
 
