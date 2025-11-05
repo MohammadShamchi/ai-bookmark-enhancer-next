@@ -42,15 +42,22 @@ Open separate Cursor sessions/agents for different issues:
 
 ## 📋 File Structure
 
-### Core Documentation
-- **`00-CODEBASE-CONTEXT.md`** - Master context file (read first for every fix!)
+### Core Documentation (4 files)
+- **`00-CODEBASE-CONTEXT.md`** - Complete architecture reference (READ THIS FIRST!)
+- **`README.md`** - This file - Full guide on how to use these files
+- **`QUICK-START.md`** - Quick reference guide (start here!)
 - **`DEPENDENCIES.md`** - Conflict matrix and recommended execution order
-- **`README.md`** - This file
 
-### Issue Files
-- **`P0-XX-*.md`** - Priority 0 (Critical) issues
-- **`P1-XX-*.md`** - Priority 1 (High) issues
-- **`P2-XX-*.md`** - Priority 2 (Medium) issues
+### P0 Issue Files (7 critical priority)
+- **`P0-01-sequential-processing.md`** - 3x faster AI processing
+- **`P0-02-time-estimation.md`** - Show ETA to users
+- **`P0-03-fast-mode-fix.md`** - Make fast mode useful
+- **`P0-04-hardcoded-model.md`** - Let users choose AI model
+- **`P0-05-ai-consistency.md`** - Same bookmarks → same results
+- **`P0-06-processing-feedback.md`** - Show detailed progress
+- **`P0-07-apply-performance.md`** - 5-6x faster applying
+
+**Total: 11 files in the /FIXES directory**
 
 ---
 
@@ -66,8 +73,8 @@ These directly impact user experience and were explicitly mentioned by the user:
 - **P0-06**: Minimal Processing Feedback (no detailed progress)
 - **P0-07**: Slow Apply Process (bookmark creation bottleneck)
 
-### P1 - High (Fix Soon)
-Important functionality issues and error handling:
+### P1 - High (Future - Not Yet Created)
+Important functionality issues and error handling that should be addressed after P0:
 - Rate limit handling
 - Network retry logic
 - Invalid bookmark ID handling
@@ -77,12 +84,16 @@ Important functionality issues and error handling:
 - Privacy warnings
 - Quality metrics
 
-### P2 - Medium (Nice to Have)
+**Note**: P1 issue files have not been created yet. Focus on P0 issues first.
+
+### P2 - Medium (Future - Not Yet Created)
 Enhancements that improve the product but aren't urgent:
 - Incremental apply
 - Bookmark metadata usage
 - Multi-level folders
 - Custom domain mappings
+
+**Note**: P2 issue files have not been created yet. Focus on P0 issues first.
 
 ---
 

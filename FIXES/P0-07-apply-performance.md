@@ -20,7 +20,7 @@ For 2,066 bookmarks:
 - **Apply: 5-10 minutes** ← This issue
 - Total: 15-30 minutes
 
-### Current Implementation (`lib/apply.js:119-138`)
+### Current Implementation (`lib/apply.js:118-138`)
 
 ```javascript
 const batches = chunk(toCreate, Math.max(1, batchSize));

@@ -2,6 +2,8 @@
 
 This document helps you avoid conflicts when multiple agents work in parallel.
 
+**Important**: This document references P1 and P2 issues that have not been created yet. Focus on P0 issues (P0-01 through P0-07) first. The P1/P2 references are for future planning.
+
 ## 🚦 Conflict Groups
 
 ### Group A: AI Processing Core
@@ -9,10 +11,10 @@ This document helps you avoid conflicts when multiple agents work in parallel.
 - P0-01: Sequential Processing → `lib/ai_client.js`
 - P0-04: Hardcoded Model → `lib/ai_client.js`, `ui/settings.html/js`
 - P0-05: AI Consistency → `lib/ai_client.js`
-- P1-01: Chunk Context → `lib/ai_client.js`
-- P1-02: Rate Limits → `lib/ai_client.js`
+- P1-01: Chunk Context → `lib/ai_client.js` (not yet created)
+- P1-02: Rate Limits → `lib/ai_client.js` (not yet created)
 
-**Recommendation**: Fix in order P0-01 → P0-05 → P0-04 → P1-01 → P1-02
+**Recommendation**: Fix in order P0-01 → P0-05 → P0-04 (then P1-01 → P1-02 when created)
 
 ---
 
@@ -20,9 +22,9 @@ This document helps you avoid conflicts when multiple agents work in parallel.
 **Low conflict - can work in parallel:**
 - P0-02: Time Estimation → `background.js`, `ui/page2.js`, `ui/page2.html`
 - P0-06: Processing Feedback → `ui/page2.js`, `ui/page2.html`
-- P1-03: Preview Before Run → `ui/page1.js`, `ui/page1.html`
+- P1-03: Preview Before Run → `ui/page1.js`, `ui/page1.html` (not yet created)
 
-**Recommendation**: Can work simultaneously if different people
+**Recommendation**: P0-02 and P0-06 can work simultaneously if different people
 
 ---
 
@@ -37,30 +39,30 @@ This document helps you avoid conflicts when multiple agents work in parallel.
 ### Group D: Apply Process
 **Low conflict - can work in parallel:**
 - P0-07: Apply Performance → `lib/apply.js`
-- P1-04: Empty Folder Handling → `lib/organizer.js`
-- P1-05: Duplicate Detection → `lib/organizer.js`, `lib/apply.js`
+- P1-04: Empty Folder Handling → `lib/organizer.js` (not yet created)
+- P1-05: Duplicate Detection → `lib/organizer.js`, `lib/apply.js` (not yet created)
 
-**Recommendation**: Do P0-07 first, then P1-04 and P1-05 together
+**Recommendation**: Do P0-07 first (then P1-04 and P1-05 together when created)
 
 ---
 
-### Group E: Error Handling
+### Group E: Error Handling (Not Yet Created)
 **Different files - full parallel:**
-- P1-06: Network Retry → `lib/ai_client.js`
-- P1-07: Invalid Bookmark IDs → `lib/organizer.js`, `lib/apply.js`
-- P1-08: Storage Quota → `lib/storage.js`
+- P1-06: Network Retry → `lib/ai_client.js` (not yet created)
+- P1-07: Invalid Bookmark IDs → `lib/organizer.js`, `lib/apply.js` (not yet created)
+- P1-08: Storage Quota → `lib/storage.js` (not yet created)
 
-**Recommendation**: Fully parallel
+**Recommendation**: Fully parallel (when created)
 
 ---
 
-### Group F: User Experience
+### Group F: User Experience (Not Yet Created)
 **Different areas - full parallel:**
-- P1-09: Quality Metrics → `ui/page3.js`, `ui/page3.html`
-- P1-10: Privacy Warning → `ui/settings.js`, `ui/settings.html`
-- P2-01: Incremental Apply → `lib/apply.js`, `ui/page3.js`
+- P1-09: Quality Metrics → `ui/page3.js`, `ui/page3.html` (not yet created)
+- P1-10: Privacy Warning → `ui/settings.js`, `ui/settings.html` (not yet created)
+- P2-01: Incremental Apply → `lib/apply.js`, `ui/page3.js` (not yet created)
 
-**Recommendation**: Fully parallel
+**Recommendation**: Fully parallel (when created)
 
 ---
 
@@ -78,7 +80,8 @@ This document helps you avoid conflicts when multiple agents work in parallel.
 ### Phase 3: Model Configuration (After Phase 1)
 - P0-04: Hardcoded model (needs stable ai_client.js)
 
-### Phase 4: Polish (Parallel)
+### Phase 4: Polish (Parallel - Future)
+**Note: These P1 issues have not been created yet**
 - Agent 1: P1-01, P1-02 (Chunk context, rate limits)
 - Agent 2: P1-04, P1-05 (Folder handling, duplicates)
 - Agent 3: P1-06, P1-07, P1-08 (Error handling)
